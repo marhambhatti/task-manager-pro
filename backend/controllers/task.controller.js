@@ -1,4 +1,3 @@
-const taskModel = require("../models/task.model");
 const Task=require("../models/task.model");
 
 const createTask=async(req,res,next)=>{
@@ -14,7 +13,7 @@ dueDate
 }=req.body;
 
 // validation (important)
-if(!title){
+if(!title?.trim()){
 return res.status(400).json({
 message:"Title is required"
 });
@@ -22,7 +21,7 @@ message:"Title is required"
 
 // task create
 const task=await Task.create({
-title,
+title:title.trim(),
 description,
 status,
 priority,
@@ -46,40 +45,55 @@ next(error);
 }
 }
 
-// Get Task Without Pagination
-const getTask=async (req,res)=>{
-    const tasks=await Task.find({
-        createdBy:req.user.id
-    })
-
-    res.status(200).json({
-        success:true,
-        tasks
-    })
-
-}
-
-// Get Task With Pagination
-
-const getTaskWithPagination=async (req,res,next)=>{
-   try {
-     const page=Number(req.query.page)||1
-    const limit=Number(req.query.limit)||5
-
+const getTask=async (req,res,next)=>{
+    try {
+    const page=Math.max(Number(req.query.page)||1,1);
+    const limit=Math.min(Math.max(Number(req.query.limit)||5,1),50);
     const skip=(page-1)*limit;
+    const {search,status,priority,category}=req.query;
 
-    const tasks=await Task.find({
+    const filter={
         createdBy:req.user.id
-    }).skip(skip).limit(limit).sort({createdAt:-1});
+    };
 
-    
+    if(search){
+        filter.title={
+            $regex:search,
+            $options:"i"
+        };
+    }
+
+    if(status){
+        filter.status=status;
+    }
+
+    if(priority){
+        filter.priority=priority;
+    }
+
+    if(category){
+        filter.category=category;
+    }
+
+    const [tasks,total]=await Promise.all([
+        Task.find(filter).sort({createdAt:-1}).skip(skip).limit(limit),
+        Task.countDocuments(filter)
+    ]);
+
     res.status(200).json({
         success:true,
-        tasks
+        tasks,
+        pagination:{
+            page,
+            limit,
+            total,
+            totalPages:Math.ceil(total/limit)||1
+        }
     })
-   } catch (error) {
-    next(error);
-   }
+    } catch (error) {
+        next(error);
+    }
+
 }
 const updateTask=async (req,res,next)=>{
     try{
@@ -99,10 +113,29 @@ message:"Task not found or unauthorized"
 }
 
 // update task
-const updatedTask=await Task.findByIdAndUpdate(
-taskId,
-req.body,
-{new:true}
+const allowedUpdates=["title","description","status","priority","category","dueDate"];
+const updates={};
+
+allowedUpdates.forEach((field)=>{
+if(req.body[field]!==undefined){
+updates[field]=req.body[field];
+}
+});
+
+if(updates.title!==undefined && !updates.title.trim()){
+return res.status(400).json({
+message:"Title is required"
+});
+}
+
+if(updates.title){
+updates.title=updates.title.trim();
+}
+
+const updatedTask=await Task.findOneAndUpdate(
+{_id:taskId,createdBy:req.user.id},
+updates,
+{new:true,runValidators:true}
 );
 
 res.json({
@@ -151,19 +184,20 @@ next(error)
 const searchByTitle= async (req,res,next)=>{
     try{
     const {title}=req.query;
+    if(!title){
+        return res.status(200).json({
+            success:true,
+            tasks:[]
+        });
+    }
+
     const tasks=await Task.find({
         title:{
             $regex:title,
             $options:"i"
         },
         createdBy:req.user.id
-    });
-    if(tasks.length==0){
-        res.status(404).json({
-            success:false,
-            message:"Title Does NOt Exist.."
-        })
-    }
+    }).sort({createdAt:-1});
 
     res.status(200).json({
         success:true,
@@ -195,14 +229,7 @@ if(category){
 filter.category=category;
 }
 
-const tasks=await Task.find(filter);
-
-if(tasks.length===0){
-return res.status(404).json({
-success:false,
-message:"No tasks found"
-});
-}
+const tasks=await Task.find(filter).sort({createdAt:-1});
 
 res.status(200).json({
 success:true,

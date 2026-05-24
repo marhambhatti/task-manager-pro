@@ -13,14 +13,14 @@ const taskroute=express.Router();
 //  Create
 taskroute.post("/task/create",auth,createTask);
 //  Get All
-taskroute.get("/task/get",auth,getTask);
+taskroute.get("/task",auth,getTask);
 // Get By Title
 taskroute.get("/task/search",auth,searchByTitle);
 // Get By status , priority, category
 taskroute.get("/task/filter",auth,filterTasks);
 // Update
-taskroute.put("/task/update",auth,updateTask);
+taskroute.put("/task/:id",auth,updateTask);
 // Delete
-taskroute.delete("/task/delete",auth,deleteTask);
+taskroute.delete("/task/:id",auth,deleteTask);
 
 module.exports=taskroute;
