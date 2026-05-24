@@ -1,105 +1,60 @@
-# Task Manager Backend
+# Task Manager Pro
 
-A secure Task Manager backend built with the MERN stack backend technologies using Node.js, Express.js, MongoDB, and JWT authentication.
+A full-stack MERN task manager with authentication, protected task ownership, search, filters, pagination, and a polished React frontend.
 
 ## Features
 
-### Authentication
-
-* User Registration
-* User Login
-* Password hashing using bcryptjs
-* JWT Authentication
-* Protected Routes
-
-### Task Management
-
-* Create Task
-* Get Tasks
-* Update Task
-* Delete Task
-* User-specific task ownership
-
-### Advanced Features
-
-* Search tasks by title
-* Filter tasks by:
-
-  * Status
-  * Priority
-  * Category
-* Pagination
-* Sorting
-* Centralized error handling
+- User registration and login
+- Password hashing with `bcryptjs`
+- JWT-protected API routes
+- User-specific task ownership
+- Create, read, update, and delete tasks
+- Task fields: title, description, status, priority, category, due date
+- Search tasks by title
+- Filter tasks by status, priority, and category
+- Paginated task list
+- Responsive frontend with home, auth, and dashboard pages
 
 ## Tech Stack
 
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* JWT
-* bcryptjs
-* dotenv
+- Frontend: React, Vite, Axios, React Router, React Hot Toast, Tailwind CSS
+- Backend: Node.js, Express.js, MongoDB, Mongoose
+- Auth: JWT, bcryptjs
 
 ## Project Structure
 
 ```txt
-backend/
-│
-├── config/
-│   └── db.js
-│
-├── controllers/
-│   ├── authController.js
-│   └── task.controller.js
-│
-├── middleware/
-│   ├── auth.middleware.js
-│   └── error.middleware.js
-│
-├── models/
-│   ├── user.model.js
-│   └── task.model.js
-│
-├── routes/
-│   ├── user.route.js
-│   └── task.route.js
-│
-├── server.js
-├── .env
-├── package.json
+task-manager-pro/
+  backend/
+    config/
+    controllers/
+    middleware/
+    models/
+    routes/
+    server.js
+    package.json
+
+  frontend/
+    frontend/
+      src/
+        components/
+        pages/
+        routes/
+        services/
+        assets/
+      package.json
 ```
 
-## Installation
+## Getting Started
 
-Clone repository:
-
-```bash
-git clone <repository-url>
-```
-
-Move into backend:
+Install backend dependencies:
 
 ```bash
 cd backend
-```
-
-Install dependencies:
-
-```bash
 npm install
 ```
 
-Run server:
-
-```bash
-npm run dev
-```
-
-## Environment Variables
-
-Create a .env file:
+Create `backend/.env`:
 
 ```env
 PORT=5000
@@ -107,58 +62,119 @@ MONGOURL=mongodb://localhost:27017/Task
 JWT_SECRET=your_secret_key
 ```
 
+Run the backend:
+
+```bash
+npm run dev
+```
+
+Install frontend dependencies:
+
+```bash
+cd frontend/frontend
+npm install
+```
+
+Run the frontend:
+
+```bash
+npm run dev
+```
+
+Frontend runs on `http://localhost:5173` and the backend runs on `http://localhost:5000`.
+
 ## API Routes
 
-### Authentication
+### Auth
 
+```txt
 POST /api/register
-
 POST /api/login
+```
 
 ### Tasks
 
-POST /api/task/create
+All task routes require:
 
-GET /api/tasks
+```txt
+Authorization: Bearer <token>
+```
 
-PUT /api/task/:id
-
+```txt
+POST   /api/task/create
+GET    /api/task
+PUT    /api/task/:id
 DELETE /api/task/:id
+```
 
-### Search
+### Query Examples
 
+Paginated tasks:
+
+```txt
+GET /api/task?page=1&limit=5
+```
+
+Search:
+
+```txt
+GET /api/task?search=assignment&page=1&limit=5
+```
+
+Filters:
+
+```txt
+GET /api/task?status=Pending
+GET /api/task?priority=High
+GET /api/task?category=Study
+```
+
+Combined:
+
+```txt
+GET /api/task?search=project&status=In%20Progress&priority=High&page=1&limit=5
+```
+
+Legacy helper routes also exist:
+
+```txt
 GET /api/task/search?title=value
-
-### Filters
-
 GET /api/task/filter?status=Pending
+```
 
-GET /api/task/filter?priority=High
+## Task Model
 
-GET /api/task/filter?category=Study
+```js
+{
+  title: String,
+  description: String,
+  status: "Pending" | "In Progress" | "Completed",
+  priority: "Low" | "Medium" | "High",
+  category: "Personal" | "Study" | "Work" | "Health" | "Other",
+  dueDate: Date,
+  createdBy: ObjectId
+}
+```
 
-### Pagination
+## Verification
 
-GET /api/tasks?page=1&limit=5
+Frontend:
 
-### Sorting
+```bash
+npm run lint
+npm run build
+```
 
-GET /api/tasks?sort=newest
+Backend:
 
-GET /api/tasks?sort=oldest
+```bash
+node --check server.js
+node --check controllers/task.controller.js
+node --check routes/task.route.js
+```
 
-GET /api/tasks?sort=due
+## Notes
 
-## Security
-
-* JWT protected routes
-* Password hashing
-* User ownership validation
-* Task access restriction
-
-## Future Improvements
-
-* File upload support
-* Team collaboration
-* Task analytics
-* Drag
+- The frontend API base URL is configured in `frontend/frontend/src/services/api.js`.
+- Make sure MongoDB is running before starting the backend.
+- Task data is protected per user through JWT authentication and ownership checks.
