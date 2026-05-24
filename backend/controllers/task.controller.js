@@ -1,7 +1,7 @@
 const taskModel = require("../models/task.model");
 const Task=require("../models/task.model");
 
-const createTask=async(req,res)=>{
+const createTask=async(req,res,next)=>{
 try{
 
 const {
@@ -41,10 +41,7 @@ task
 }catch(error){
 
 console.log("CREATE TASK ERROR:",error);
-
-res.status(500).json({
-message:error.message
-});
+next(error);
 
 }
 }
@@ -59,7 +56,7 @@ const getTask=async (req,res)=>{
     })
 
 }
-const updateTask=async (req,res)=>{
+const updateTask=async (req,res,next)=>{
     try{
 
 const taskId=req.params.id;
@@ -90,14 +87,12 @@ task:updatedTask
 });
 
 }catch(error){
-res.status(500).json({
-message:error.message
-});
+next(error);
 }
 }
 
 
-const deleteTask=async (req,res)=>{
+const deleteTask=async (req,res,next)=>{
     try{
 
 const taskId=req.params.id;
@@ -122,13 +117,76 @@ message:"Task deleted successfully"
 });
 
 }catch(error){
-res.status(500).json({
-message:error.message
+next(error)
+}
+}
+
+
+
+const searchByTitle= async (req,res,next)=>{
+    try{
+    const {title}=req.query;
+    const tasks=await Task.find({
+        title:{
+            $regex:title,
+            $options:"i"
+        },
+        createdBy:req.user.id
+    });
+    if(tasks.length==0){
+        res.status(404).json({
+            success:false,
+            message:"Title Does NOt Exist.."
+        })
+    }
+
+    res.status(200).json({
+        success:true,
+        tasks
+    })
+}catch(error){
+    next(error);
+}
+}
+
+const filterTasks=async(req,res,next)=>{
+try{
+
+const {status,priority,category}=req.query;
+
+let filter={
+createdBy:req.user.id
+};
+
+if(status){
+filter.status=status;
+}
+
+if(priority){
+filter.priority=priority;
+}
+
+if(category){
+filter.category=category;
+}
+
+const tasks=await Task.find(filter);
+
+if(tasks.length===0){
+return res.status(404).json({
+success:false,
+message:"No tasks found"
 });
 }
+
+res.status(200).json({
+success:true,
+count:tasks.length,
+tasks
+});
+
+}catch(error){
+next(error);
 }
-
-
-
-
-module.exports={createTask,getTask,updateTask,deleteTask};
+}
+module.exports={createTask,getTask,updateTask,deleteTask,searchByTitle,filterTasks};

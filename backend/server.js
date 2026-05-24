@@ -10,6 +10,9 @@ const taskroute=require("./routes/task.route");
 app.use(express.json())
 app.use("/api",route);
 app.use("/api",taskroute);
+
+
+app.use(require("./middleware/error.middleware"));
 app.listen((port),()=>{
     console.log(`Server Is Running On Port ${port}`);
 })
