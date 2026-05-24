@@ -1,0 +1,137 @@
+.auth-page {
+  display: grid;
+  grid-template-columns: minmax(320px, 520px) 1fr;
+  min-height: 100vh;
+  background: #eef3f7;
+  color: #111827;
+}
+
+.auth-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 6vw, 64px);
+  background: #ffffff;
+}
+
+.auth-brand {
+  width: fit-content;
+  margin-bottom: 44px;
+  color: #111827;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.auth-kicker {
+  margin: 0 0 10px;
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.auth-panel h1 {
+  max-width: 420px;
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.05;
+  font-weight: 900;
+}
+
+.auth-copy {
+  max-width: 390px;
+  margin: 16px 0 28px;
+  color: #64748b;
+  line-height: 1.65;
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 390px);
+}
+
+.auth-form input {
+  width: 100%;
+  border: 1px solid #d7dee8;
+  border-radius: 8px;
+  padding: 13px 14px;
+  color: #111827;
+  background: #f8fafc;
+  outline: none;
+}
+
+.auth-form input:focus {
+  border-color: #14b8a6;
+  box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14);
+}
+
+.auth-form button {
+  min-height: 46px;
+  border: none;
+  border-radius: 8px;
+  color: #042f2e;
+  background: #14b8a6;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.auth-form button:hover {
+  background: #2dd4bf;
+}
+
+.auth-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.auth-switch {
+  margin: 22px 0 0;
+  color: #64748b;
+}
+
+.auth-switch a {
+  color: #0f766e;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.auth-side {
+  display: flex;
+  align-items: flex-end;
+  min-height: 100%;
+  padding: clamp(28px, 6vw, 72px);
+  background:
+    linear-gradient(140deg, rgba(15, 23, 42, 0.94), rgba(15, 118, 110, 0.82)),
+    url("../assets/hero.png") center / cover;
+  color: white;
+}
+
+.auth-side div {
+  max-width: 560px;
+}
+
+.auth-side span {
+  color: #7dd3fc;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.auth-side h2 {
+  margin: 12px 0 0;
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  line-height: 1;
+  font-weight: 900;
+}
+
+@media (max-width: 860px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-side {
+    min-height: 280px;
+  }
+}
